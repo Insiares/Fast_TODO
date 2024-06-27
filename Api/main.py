@@ -5,7 +5,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from fastapi.security import OAuth2PasswordRequestForm
-from fast_todo import auth, crud, database, models, schemas
+from Api import auth, crud, database, models, schemas
 
 app = FastAPI()
 
@@ -83,7 +83,7 @@ def delete_task(task_id: int, db: Session = Depends(database.get_db), user_id: i
         )
 
 # Démarrage de l'application:
-# uvicorn fast_todo.main:app --reload
+# uvicorn API.main:app --reload
 
 # documentation de l'API
 # http://127.0.0.1:8000/docs
