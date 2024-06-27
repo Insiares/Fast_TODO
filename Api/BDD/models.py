@@ -4,24 +4,29 @@ from supabase import create_client, Client
 import datetime
 from functools import wraps
 from dotenv import load_dotenv
+import yaml
 
-load_dotenv(dotenv_path='credentials.env')
+with open('/home/insia/Simplon/13b_FastAPI/Fast_TODO/Api/BDD/.credentials.yml') as f:
+    creds=yaml.load(f, Loader=yaml.FullLoader)
 
-url = os.environ.get("DB_URL")
-key = os.environ.get("PWD_DB")
+# load_dotenv(dotenv_path='./credentials.env')
+
+url = creds["DB_URL"]
+key = creds["PWD_DB"]
 
 supa = create_client(url, key)
 
 
-def add_args(func):
+''' def(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         kwargs["supabase"] = supa
         return func(*args, **kwargs)
-    return wrapper
+    return wrapper '''
 
-@add_args
-def insert_db(tab, data, supabase=None):
+
+
+def insert_db(tab, data, supabase=supa):
     """
     Insert data into desired table
 
@@ -42,8 +47,8 @@ def insert_db(tab, data, supabase=None):
     return response
 
 
-@add_args
-def fetch_tasks(user_id, supabase=None):
+
+def fetch_tasks(user_id, supabase=supa):
     """
     fetch tasks table
 
@@ -60,8 +65,8 @@ def fetch_tasks(user_id, supabase=None):
     )
     return response
 
-@add_args
-def fetch_users(user_id, supabase=None):
+
+def fetch_users(username, supabase=supa):
     """
     fetch users table
 
@@ -72,13 +77,13 @@ def fetch_users(user_id, supabase=None):
     (dict) name and password of the signed in user.
     """
     response = (supabase.table("users").select("*")
-    .eq("user_id", user_id)
+    .eq("username", username)
     .execute()
     )
     return response
 
-@add_args
-def complete_task(task_id, supabase=None):
+
+def complete_task(task_id, supabase=supa):
     """
     Turn the completed column of a task from FALSE to TRUE
 
@@ -96,8 +101,8 @@ def complete_task(task_id, supabase=None):
     )
     return response
 
-@add_args
-def update_tab(tab, col, val, id, supabase=None):
+
+def update_tab(tab, col, val, id, supabase=supa):
     """
     Replace a value in a selected table
 
@@ -119,8 +124,8 @@ def update_tab(tab, col, val, id, supabase=None):
     return response
 
 
-@add_args
-def delete_row(tab, id, supabase=None):
+
+def delete_row(tab, id, supabase=supa):
     """
     delete a complete row in a selected table
 
