@@ -1,5 +1,6 @@
-# fast_todo/auth.py
+# auth.py
 # Gestion de l'authentification
+
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

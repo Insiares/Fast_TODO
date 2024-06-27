@@ -1,5 +1,6 @@
 # models.py
 # Définition des modèles SQLAlchemy représentant les tables de la base de données.
+
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date
 from sqlalchemy.orm import relationship
 from .database import Base

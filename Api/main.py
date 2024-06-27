@@ -1,5 +1,5 @@
-# fast_todo/main.py
-#  Point d'entrée de l'application FastAPI, définit les routes (endpoints).
+# main.py
+# Point d'entrée de l'application FastAPI, définit les routes (endpoints).
 
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -83,7 +83,7 @@ def delete_task(task_id: int, db: Session = Depends(database.get_db), user_id: i
         )
 
 # Démarrage de l'application:
-# uvicorn API.main:app --reload
+# uvicorn Api.main:app --reload
 
 # documentation de l'API
 # http://127.0.0.1:8000/docs
