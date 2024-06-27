@@ -30,6 +30,5 @@ class UserCreate(UserBase):
     password: str
 
 class User(UserBase):
-    id: int
-
+    id: Optional[int] = None
     model_config = ConfigDict(from_attributes=True)

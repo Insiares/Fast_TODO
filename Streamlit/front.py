@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import requests
 
 # User credentials (for simplicity, we use a dictionary; in a real app, use a database)
 USER_CREDENTIALS = [{
@@ -119,20 +120,29 @@ if is_logged_in():
       
 # Optionally, add a sign-up section (not secure, just for demonstration)
 st.write("Don't have an account? Sign up here:")
-if st.button("Register", key="register"):
-    new_username = st.text_input("New Username")
-    new_password = st.text_input("New Password", type="password")
-    confirm_password = st.text_input("Confirm Password", type="password")
+new_username = st.text_input("New Username")
+new_password = st.text_input("New Password", type="password")
+confirm_password = st.text_input("Confirm Password", type="password")
 
-    if st.button("Sign Up", key="sign_up"):
-        if new_password == confirm_password:
-            if new_username in USER_CREDENTIALS:
-                st.warning("Username already exists. Please choose a different username.")
-            else:
-                USER_CREDENTIALS[new_username] = new_password
-                st.success("Account created successfully! You can now log in.")
+if st.button("Sign Up", key="sign_up"):
+    if new_password == confirm_password:
+        
+        payload = { "username": str(new_username), "password": str(new_password)}
+        response = requests.post("localhost:8000/users", data=payload)
+
+        if response.status_code == 200:
+            st.success("Account created successfully! You can now log in.")
         else:
-            st.error("Passwords do not match. Please try again.")
+            st.error("Failed to create account. Please try again.")
+
+
+        ''' if new_username in USER_CREDENTIALS:
+            st.warning("Username already exists. Please choose a different username.")
+        else:
+            USER_CREDENTIALS[new_username] = new_password
+            st.success("Account created successfully! You can now log in.") '''
+    else:
+        st.error("Passwords do not match. Please try again.")
 
 
 

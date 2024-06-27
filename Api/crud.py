@@ -4,6 +4,7 @@
 from sqlalchemy.orm import Session
 from Api import models, schemas, auth
 
+
 def get_user(db: Session, user_id: int):
     try:
         return db.query(models.User).filter(models.User.id == user_id).first()
@@ -11,12 +12,16 @@ def get_user(db: Session, user_id: int):
         print(f"Erreur lors de la récupération de l'utilisateur par ID: {e}")
         return None
 
+
 def get_user_by_username(db: Session, username: str):
     try:
         return db.query(models.User).filter(models.User.username == username).first()
     except Exception as e:
-        print(f"Erreur lors de la récupération de l'utilisateur par nom d'utilisateur: {e}")
+        print(
+            f"Erreur lors de la récupération de l'utilisateur par nom d'utilisateur: {e}"
+        )
         return None
+
 
 def create_user(db: Session, user: schemas.UserCreate):
     try:
@@ -30,12 +35,20 @@ def create_user(db: Session, user: schemas.UserCreate):
         print(f"Erreur lors de la création de l'utilisateur: {e}")
         return None
 
+
 def get_tasks(db: Session, user_id: int, skip: int = 0, limit: int = 10):
     try:
-        return db.query(models.Task).filter(models.Task.user_id == user_id).offset(skip).limit(limit).all()
+        return (
+            db.query(models.Task)
+            .filter(models.Task.user_id == user_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
     except Exception as e:
         print(f"Erreur lors de la récupération des tâches: {e}")
         return []
+
 
 def create_task(db: Session, task: schemas.TaskCreate, user_id: int):
     try:
@@ -47,6 +60,7 @@ def create_task(db: Session, task: schemas.TaskCreate, user_id: int):
     except Exception as e:
         print(f"Erreur lors de la création de la tâche: {e}")
         return None
+
 
 def update_task(db: Session, task_id: int, task: schemas.TaskUpdate):
     try:
@@ -61,6 +75,7 @@ def update_task(db: Session, task_id: int, task: schemas.TaskUpdate):
         print(f"Erreur lors de la mise à jour de la tâche: {e}")
         return None
 
+
 def delete_task(db: Session, task_id: int):
     try:
         db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
@@ -71,6 +86,7 @@ def delete_task(db: Session, task_id: int):
     except Exception as e:
         print(f"Erreur lors de la suppression de la tâche: {e}")
         return None
+
 
 def get_task(db: Session, task_id: int):
     try:
