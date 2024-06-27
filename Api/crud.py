@@ -1,7 +1,7 @@
 # fast_todo/crud.py
 #  Fonctions CRUD  qui interagissent avec la BDD
 from sqlalchemy.orm import Session
-from fast_todo import models, schemas, auth
+from Api import models, schemas, auth
 
 def get_user(db: Session, user_id: int):
     try:
