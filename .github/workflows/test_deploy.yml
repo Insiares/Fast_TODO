@@ -1,8 +1,11 @@
 name: Test & Deploy to ACI
 
 on:
-  pull_request:
-    types: [opened, reopened]
+  push:
+    branches:
+      - main
+
+      
 
 jobs:
   testing:
