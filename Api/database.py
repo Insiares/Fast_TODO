@@ -5,13 +5,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
+from dotenv import load_dotenv
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+# Charger les variables d'environnement
+load_dotenv(dotenv_path='BDD/credentials.env')
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{SUPABASE_URL}:{SUPABASE_KEY}@db.supabase.co/postgres"
+DB_URL = os.getenv("DB_URL").replace("https://", "").replace("/", "")
+PWD_DB = os.getenv("PWD_DB")
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SQLALCHEMY_DATABASE_URL = f"postgresql://{DB_URL}:{PWD_DB}@db.supabase.co/postgres"
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL) 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

@@ -1,6 +1,7 @@
 # schemas.py
-#  Définition des schémas Pydantic utilisés pour la validation des données et les réponses API.
-from pydantic import BaseModel
+# Définition des schémas Pydantic utilisés pour la validation des données et les réponses API.
+
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import date
 
@@ -20,8 +21,7 @@ class Task(TaskBase):
     id: int
     user_id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class UserBase(BaseModel):
     username: str
@@ -32,7 +32,4 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
 
-    class Config:
-        orm_mode = True
-
-
+    model_config = ConfigDict(from_attributes=True)

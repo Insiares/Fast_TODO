@@ -1,5 +1,6 @@
-# fast_todo/crud.py
-#  Fonctions CRUD  qui interagissent avec la BDD
+# crud.py
+# Fonctions CRUD qui interagissent avec la BDD
+
 from sqlalchemy.orm import Session
 from Api import models, schemas, auth
 
