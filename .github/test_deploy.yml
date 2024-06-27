@@ -1,0 +1,88 @@
+name: Test & Deploy to ACI
+
+on:
+  merge:
+    branches:
+      - main
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4.1.1
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.12
+
+
+    - name: Install dependencies
+      run: |
+        cd $GITHUB_WORKSPACE
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+
+    - name: Print sys.path
+      run: python -c "import sys; print(sys.path)"
+
+    - name: Change to the repository root
+      run: cd $GITHUB_WORKSPACE
+
+    - name: Run tests
+      run: |
+        pytest ./tests/conftest.py
+
+    - name: Run linter 
+      run: |
+        pip install ruff
+        ruff .
+
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs : testing
+    if : success()
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4.1.1
+
+    - name: Login to Azure
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Build and push Docker image
+      run: |
+        az acr build --registry Fasttodo --image todo:latest .
+
+    - name: Get Container ID
+      id: get_container_id
+      run: |
+        container_id=$(az container list --resource-group devia_25 --query "[?name=='todocontainer'].{Id:id}" -o tsv)
+        echo "::set-output name=container_id::$container_id"
+
+    - name: Delete existing container
+      if: steps.get_container_id.outputs.container_id != ''
+      run: |
+        az container delete --resource-group devia_25 --name todocontainer --yes
+
+    - name: Run new container
+      run: |
+        az container create \
+        --resource-group devia_25 \
+        --name todocontainer \
+        --image Fasttodo.azurecr.io/todo:latest \
+        --registry-username Fasttodo \
+        --registry-password $(az acr credential show --name Fasttodo --query passwords[0].value -o tsv) \
+        --environment-variables \
+          "DB_URL=${{ secrets.DB_URL}}" \
+          "PWD_DB=${{ secrets.PWD_DB }}" \
+        --cpu 1 \
+        --memory 1.5
