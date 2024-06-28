@@ -13,21 +13,26 @@ from .BDD import models
 
 
 app = FastAPI()
-
+supa = models.ini_db()
 
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate):
     try:
-        db_user = models.fetch_users(username=user.username)
+        supa = models.ini_db()
+        test_us = str(user.username)
+        db_user = models.fetch_users(username=test_us,  supabase = supa)
+
         if db_user:
             raise HTTPException(status_code=400, detail="Nom d'utilisateur déjà enregistré")
         user.password = auth.get_password_hash(user.password)
-        return models.insert_db('users', user)
+
+        return models.insert_db('users', user.dict())
+
     except Exception as e:
         print(f"Erreur lors de la création de l'utilisateur: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur interne du serveur"
+            detail= f'Erreur interne du serveur : {e}'
         )
 
 '''

@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import requests
+import json
 
 # User credentials (for simplicity, we use a dictionary; in a real app, use a database)
 USER_CREDENTIALS = [{
@@ -126,9 +127,10 @@ confirm_password = st.text_input("Confirm Password", type="password")
 
 if st.button("Sign Up", key="sign_up"):
     if new_password == confirm_password:
-        
+        headers = {"Content-Type": "application/json"}
+
         payload = { "username": str(new_username), "password": str(new_password)}
-        response = requests.post("localhost:8000/users", data=payload)
+        response = requests.post("http://localhost:8000/users/", json=payload, headers = headers)
 
         if response.status_code == 200:
             st.success("Account created successfully! You can now log in.")

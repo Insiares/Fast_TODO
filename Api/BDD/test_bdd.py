@@ -1,19 +1,39 @@
 import os
-import supabase
 from supabase import create_client, Client
 import datetime
+import yaml
+import logging
+import json
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
+def ini_db():
+    with open("/home/insia/Simplon/13b_FastAPI/Fast_TODO/Api/BDD/.credentials.yml") as f:
+        creds = yaml.load(f, Loader=yaml.FullLoader)
 
+    # load_dotenv(dotenv_path='./credentials.env')
 
+    url = creds["DB_URL"]
+    key = creds["PWD_DB"]
+    logger.debug(f"Supabase URL: {url}")
+    logger.debug(f"Supabase Key: {key}")
+    supa = create_client(url, key)
+    return supa
 
-response = (
-    supabase.table("tasks")
-    .update({"completed": "TRUE"})
-    .eq("id", 7)
-    .execute()
-)
+supabase = ini_db()
 
+payload = { "username": "mon_vier"}
+payload = json.dumps(payload)
+try:
+    response = supabase.table("users").select("*").eq("user_id", payload).execute()
+    logger.debug("Response from Supabase: %s", response)
+    print(response)
+except Exception as e:
+    logger.error(f"An error occurred: {e}")
+    logger.error("Exception details:", exc_info=True)
 
 
 def complete_task(task_id):
