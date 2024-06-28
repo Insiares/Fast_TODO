@@ -7,28 +7,32 @@ from typing import List
 from fastapi.security import OAuth2PasswordRequestForm
 from Api import auth, schemas
 from .BDD import models
+from .logger.logger import init_logger
 
 
 
-
-
+logger= init_logger("API", "api.log")
 app = FastAPI()
-supa = models.ini_db()
+
+# supa = models.ini_db()
 
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate):
     try:
-        supa = models.ini_db()
-        test_us = str(user.username)
-        db_user = models.fetch_users(username=test_us,  supabase = supa)
+        # supa = models.ini_db()
+        logger.debug(f"Creating user {user.username}")
+        db_user = models.fetch_users(username=user.username)
 
         if db_user:
+            logger.warning(f"User {user.username} already exists")
             raise HTTPException(status_code=400, detail="Nom d'utilisateur déjà enregistré")
-        user.password = auth.get_password_hash(user.password)
 
+        user.password = auth.get_password_hash(user.password)
+        logger.debug(f"User {user.username} created")
         return models.insert_db('users', user.dict())
 
     except Exception as e:
+        logger.error(f"An error occurred: {e}")
         print(f"Erreur lors de la création de l'utilisateur: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
