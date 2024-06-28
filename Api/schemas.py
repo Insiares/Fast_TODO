@@ -28,6 +28,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    model_config = ConfigDict(from_attributes=True)
 
 class User(UserBase):
     id: Optional[int] = None
