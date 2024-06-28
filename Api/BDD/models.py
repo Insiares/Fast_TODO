@@ -5,10 +5,19 @@ import datetime
 from functools import wraps
 from dotenv import load_dotenv
 import yaml
+import os
+from ..logger.logger import init_logger
+
+
+logger = init_logger("BDD", "bdd.log")
 
 
 def ini_db():
-    with open("/home/insia/Simplon/13b_FastAPI/Fast_TODO/Api/BDD/.credentials.yml") as f:
+    # TODO : Creds in env vars
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    filepath = os.path.join(base_path, ".credentials.yml")
+    logger.debug(f"Loading credentials from {filepath}")
+    with open(filepath) as f:
         creds = yaml.load(f, Loader=yaml.FullLoader)
 
     # load_dotenv(dotenv_path='./credentials.env')
@@ -16,6 +25,8 @@ def ini_db():
     url = creds["DB_URL"]
     key = creds["PWD_DB"]
     supa = create_client(url, key)
+    logger.info("Supabase connection established")
+
     return supa
 
 
@@ -48,7 +59,11 @@ def insert_db(tab, data, supabase=None):
     Returns:
     supabase response.
     """
+
+    logger.debug(f"Inserting {data} in {tab} table")
+
     response = supabase.table(tab).insert(data).execute()
+    logger.debug(f"Response from Supabase: {response}")
     return response.data[0]
 
 @add_args
@@ -62,7 +77,9 @@ def fetch_tasks(user_id, supabase=None):
     Returns:
     (list of dict) All the tasks from the signed in user.
     """
+    logger.debug(f"Fetching tasks for user {user_id}")
     response = supabase.table("tasks").select("*").eq("user_id", user_id).execute()
+    logger.debug(f"Response from Supabase: {response}")
     return response.data
 
 
@@ -78,11 +95,13 @@ def fetch_users(username, supabase=None):
     (dict) name and password of the signed in user.
     """
 
+    logger.debug(f"Fetching user {username}")
     try : 
         response = supabase.table("users").select("*").eq("username", username).execute()
-        
+        logger.debug(f"Response from Supabase: {response}")
     except Exception as e:
         print(e)
+        logger.error(f"An error occurred: {e}")
 
     return response.data
 
@@ -98,6 +117,8 @@ def complete_task(task_id, supabase=None):
     Returns:
     supabase response.
     """
+
+    logger.debug(f"Completing task {task_id}")
     response = (
         supabase.table("tasks")
         .update({"completed": "TRUE"})
@@ -105,6 +126,7 @@ def complete_task(task_id, supabase=None):
         .execute()
     )
 
+    logger.debug(f"Response from Supabase: {response}")
     return response.data
 
 @add_args
@@ -122,7 +144,9 @@ def update_tab(tab, col, val, id, supabase=None):
     supabase response.
     """
 
+    logger.debug(f"Updating {col} in {tab} table")
     response = supabase.table(tab).update({col: val}).eq("id", id).execute()
+    logger.debug(f"Response from Supabase: {response}")
     return response.data
 
 @add_args
@@ -138,5 +162,8 @@ def delete_row(tab, id, supabase=None):
     supabase response.
     """
 
+    logger.debug(f"Deleting row {id} in {tab} table")
     response = supabase.table(tab).delete().eq("id", id).execute()
+    logger.debug(f"Response from Supabase: {response}")
+
     return response.data

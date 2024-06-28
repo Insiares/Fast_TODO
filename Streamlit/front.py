@@ -138,11 +138,12 @@ if st.button("Sign Up", key="sign_up"):
             st.error("Failed to create account. Please try again.")
 
 
-        ''' if new_username in USER_CREDENTIALS:
-            st.warning("Username already exists. Please choose a different username.")
-        else:
-            USER_CREDENTIALS[new_username] = new_password
-            st.success("Account created successfully! You can now log in.") '''
+        # if new_username in USER_CREDENTIALS:
+        #     st.warning("Username already exists. Please choose a different username.")
+        # else:
+        #     USER_CREDENTIALS[new_username] = new_password
+        #     st.success("Account created successfully! You can now log in.")
+        
     else:
         st.error("Passwords do not match. Please try again.")
 
