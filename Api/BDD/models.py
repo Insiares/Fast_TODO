@@ -8,7 +8,7 @@ import yaml
 
 
 def ini_db():
-    with open("/home/insia/Simplon/13b_FastAPI/Fast_TODO/Api/BDD/.credentials.yml") as f:
+    with open("/Users/fabien/Personnal_projects/SIMPLON_FastAPI/Fast_TODO/Api/BDD/.credentials.yml") as f:
         creds = yaml.load(f, Loader=yaml.FullLoader)
 
     # load_dotenv(dotenv_path='./credentials.env')
@@ -48,8 +48,11 @@ def insert_db(tab, data, supabase=None):
     Returns:
     supabase response.
     """
-    response = supabase.table(tab).insert(data).execute()
-    return response.data[0]
+    try :
+        response = supabase.table(tab).insert(data).execute()
+    except Exception as e:
+        print(e)
+    return response
 
 @add_args
 def fetch_tasks(user_id, supabase=None):
@@ -62,8 +65,11 @@ def fetch_tasks(user_id, supabase=None):
     Returns:
     (list of dict) All the tasks from the signed in user.
     """
-    response = supabase.table("tasks").select("*").eq("user_id", user_id).execute()
-    return response.data
+    try :
+        response = supabase.table("tasks").select("*").eq("user_id", user_id).execute()
+    except Exception as e:
+        print(e)
+    return response.data[0]
 
 
 @add_args
@@ -72,19 +78,16 @@ def fetch_users(username, supabase=None):
     fetch users table
 
     Parameters:
-    user_id (int): user id of the signed in user.
+    username (string): username of the signed in user.
 
     Returns:
     (dict) name and password of the signed in user.
     """
-
     try : 
-        response = supabase.table("users").select("*").eq("username", username).execute()
-        
+        response = supabase.table("users").select("*").eq("username", username).execute()    
     except Exception as e:
         print(e)
-
-    return response.data
+    return response.data[0]
 
 
 @add_args
@@ -98,14 +101,16 @@ def complete_task(task_id, supabase=None):
     Returns:
     supabase response.
     """
-    response = (
-        supabase.table("tasks")
-        .update({"completed": "TRUE"})
-        .eq("id", task_id)
-        .execute()
-    )
-
-    return response.data
+    try : 
+        response = (
+            supabase.table("tasks")
+            .update({"completed": "TRUE"})
+            .eq("id", task_id)
+            .execute()
+        )
+    except Exception as e:
+        print(e)
+    return response
 
 @add_args
 def update_tab(tab, col, val, id, supabase=None):
@@ -121,9 +126,11 @@ def update_tab(tab, col, val, id, supabase=None):
     Returns:
     supabase response.
     """
-
-    response = supabase.table(tab).update({col: val}).eq("id", id).execute()
-    return response.data
+    try :
+        response = (supabase.table(tab).update({col: val}).eq("id", id).execute())
+    except Exception as e:
+        print(e)
+    return response
 
 @add_args
 def delete_row(tab, id, supabase=None):
@@ -137,6 +144,8 @@ def delete_row(tab, id, supabase=None):
     Returns:
     supabase response.
     """
-
-    response = supabase.table(tab).delete().eq("id", id).execute()
-    return response.data
+    try :
+        response = supabase.table(tab).delete().eq("id", id).execute()
+    except Exception as e:
+        print(e)
+    return response
