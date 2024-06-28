@@ -11,8 +11,6 @@ def ini_db():
     with open("/Users/fabien/Personnal_projects/SIMPLON_FastAPI/Fast_TODO/Api/BDD/.credentials.yml") as f:
         creds = yaml.load(f, Loader=yaml.FullLoader)
 
-    # load_dotenv(dotenv_path='./credentials.env')
-
     url = creds["DB_URL"]
     key = creds["PWD_DB"]
     supa = create_client(url, key)
@@ -52,7 +50,7 @@ def insert_db(tab, data, supabase=None):
         response = supabase.table(tab).insert(data).execute()
     except Exception as e:
         print(e)
-    return response
+    return response.data
 
 @add_args
 def fetch_tasks(user_id, supabase=None):
@@ -69,8 +67,7 @@ def fetch_tasks(user_id, supabase=None):
         response = supabase.table("tasks").select("*").eq("user_id", user_id).execute()
     except Exception as e:
         print(e)
-    return response.data[0]
-
+    return response.data
 
 @add_args
 def fetch_users(username, supabase=None):
@@ -110,7 +107,7 @@ def complete_task(task_id, supabase=None):
         )
     except Exception as e:
         print(e)
-    return response
+    return response.data
 
 @add_args
 def update_tab(tab, col, val, id, supabase=None):
@@ -130,7 +127,7 @@ def update_tab(tab, col, val, id, supabase=None):
         response = (supabase.table(tab).update({col: val}).eq("id", id).execute())
     except Exception as e:
         print(e)
-    return response
+    return response.data
 
 @add_args
 def delete_row(tab, id, supabase=None):
@@ -148,4 +145,7 @@ def delete_row(tab, id, supabase=None):
         response = supabase.table(tab).delete().eq("id", id).execute()
     except Exception as e:
         print(e)
-    return response
+    return response.data
+
+
+print(fetch_tasks(33))
