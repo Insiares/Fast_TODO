@@ -13,14 +13,13 @@ logger = init_logger("BDD", "bdd.log")
 
 
 def ini_db():
+
     # TODO : Creds in env vars
     base_path = os.path.dirname(os.path.abspath(__file__))
     filepath = os.path.join(base_path, ".credentials.yml")
     logger.debug(f"Loading credentials from {filepath}")
     with open(filepath) as f:
         creds = yaml.load(f, Loader=yaml.FullLoader)
-
-    # load_dotenv(dotenv_path='./credentials.env')
 
     url = creds["DB_URL"]
     key = creds["PWD_DB"]
@@ -60,11 +59,16 @@ def insert_db(tab, data, supabase=None):
     supabase response.
     """
 
-    logger.debug(f"Inserting {data} in {tab} table")
-
-    response = supabase.table(tab).insert(data).execute()
-    logger.debug(f"Response from Supabase: {response}")
+    try :
+        logger.debug(f"Inserting {data} in {tab} table")
+        response = supabase.table(tab).insert(data).execute()
+        logger.debug(f"Response from Supabase: {response}")
+    except Exception as e:
+        print(e)
+        
+       
     return response.data[0]
+
 
 @add_args
 def fetch_tasks(user_id, supabase=None):
@@ -77,11 +81,18 @@ def fetch_tasks(user_id, supabase=None):
     Returns:
     (list of dict) All the tasks from the signed in user.
     """
-    logger.debug(f"Fetching tasks for user {user_id}")
-    response = supabase.table("tasks").select("*").eq("user_id", user_id).execute()
-    logger.debug(f"Response from Supabase: {response}")
-    return response.data
 
+    try :
+         logger.debug(f"Fetching tasks for user {user_id}")
+        response = supabase.table("tasks").select("*").eq("user_id", user_id).execute()
+    except Exception as e:
+        print(e)
+
+
+
+    logger.debug(f"Response from Supabase: {response}")
+
+    return response.data
 
 @add_args
 def fetch_users(username, supabase=None):
@@ -89,21 +100,21 @@ def fetch_users(username, supabase=None):
     fetch users table
 
     Parameters:
-    user_id (int): user id of the signed in user.
+    username (string): username of the signed in user.
 
     Returns:
     (dict) name and password of the signed in user.
     """
-
     logger.debug(f"Fetching user {username}")
     try : 
-        response = supabase.table("users").select("*").eq("username", username).execute()
+        response = supabase.table("users").select("*").eq("username", username).execute()    
         logger.debug(f"Response from Supabase: {response}")
     except Exception as e:
         print(e)
         logger.error(f"An error occurred: {e}")
+              
+    return response.data[0]
 
-    return response.data
 
 
 @add_args
@@ -118,15 +129,19 @@ def complete_task(task_id, supabase=None):
     supabase response.
     """
 
-    logger.debug(f"Completing task {task_id}")
-    response = (
-        supabase.table("tasks")
-        .update({"completed": "TRUE"})
-        .eq("id", task_id)
-        .execute()
-    )
+    try : 
+        logger.debug(f"Completing task {task_id}")
+        response = (
+            supabase.table("tasks")
+            .update({"completed": "TRUE"})
+            .eq("id", task_id)
+            .execute()
+        )
+    except Exception as e:
+        print(e)
+        logger.error(f"An error occurred: {e}")
 
-    logger.debug(f"Response from Supabase: {response}")
+
     return response.data
 
 @add_args
@@ -143,12 +158,19 @@ def update_tab(tab, col, val, id, supabase=None):
     Returns:
     supabase response.
     """
-
     logger.debug(f"Updating {col} in {tab} table")
-    response = supabase.table(tab).update({col: val}).eq("id", id).execute()
+
+    try :
+        response = (supabase.table(tab).update({col: val}).eq("id", id).execute())
+    except Exception as e:
+        print(e)
+        logger.error(f"An error occurred: {e}")
+        
     logger.debug(f"Response from Supabase: {response}")
+
     return response.data
 
+  
 @add_args
 def delete_row(tab, id, supabase=None):
     """
@@ -163,7 +185,15 @@ def delete_row(tab, id, supabase=None):
     """
 
     logger.debug(f"Deleting row {id} in {tab} table")
-    response = supabase.table(tab).delete().eq("id", id).execute()
+    try :
+        response = supabase.table(tab).delete().eq("id", id).execute()
+    except Exception as e:
+        print(e)
+        logger.error(f"An error occurred: {e}")
+
     logger.debug(f"Response from Supabase: {response}")
 
     return response.data
+
+
+#print(fetch_tasks(33))
